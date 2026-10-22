@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "Scene.hpp"
 #include "UUID.hpp"
+#include "AudioSourceComponent.hpp"
 #include <cassert>
 #include <iostream>
 #include <unordered_map>
@@ -144,6 +145,44 @@ void TestEntityHandleResolution() {
   std::cout << "[PASS] TestEntityHandleResolution" << std::endl;
 }
 
+void TestAudioSourceEntityCreation() {
+  Scene scene;
+  auto entity = std::make_shared<GameObject>("Audio Source");
+  entity->AddComponent<Elysium::AudioSourceComponent>();
+  scene.AddGameObject(entity);
+
+  assert(entity->name == "Audio Source");
+  assert(entity->HasComponent<Elysium::AudioSourceComponent>());
+  auto *audioComp = entity->GetComponent<Elysium::AudioSourceComponent>();
+  assert(audioComp != nullptr);
+  assert(audioComp->gameObject == entity.get());
+  assert(audioComp->volume == 100.0f);
+  (void)audioComp;
+
+  // Test duplication with AudioSourceComponent
+  auto clone = std::make_shared<GameObject>(entity->name + " (Copy)");
+  if (auto *audio = entity->GetComponent<Elysium::AudioSourceComponent>()) {
+    auto &newAudio = clone->AddComponent<Elysium::AudioSourceComponent>(
+        audio->filepath, audio->playOnAwake, audio->loop);
+    newAudio.volume = audio->volume;
+    newAudio.pitch = audio->pitch;
+    newAudio.isSpatial = audio->isSpatial;
+    newAudio.minDistance = audio->minDistance;
+    newAudio.attenuation = audio->attenuation;
+  }
+  scene.AddGameObject(clone);
+
+  assert(clone->name == "Audio Source (Copy)");
+  assert(clone->HasComponent<Elysium::AudioSourceComponent>());
+  auto *cloneAudioComp = clone->GetComponent<Elysium::AudioSourceComponent>();
+  assert(cloneAudioComp != nullptr);
+  assert(cloneAudioComp->gameObject == clone.get());
+  assert(cloneAudioComp->volume == 100.0f);
+  (void)cloneAudioComp;
+
+  std::cout << "[PASS] TestAudioSourceEntityCreation" << std::endl;
+}
+
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
@@ -154,6 +193,7 @@ int main(int argc, char **argv) {
   TestGameObjectUUIDIntegration();
   TestSceneEntityLookupAndDeletion();
   TestEntityHandleResolution();
+  TestAudioSourceEntityCreation();
   std::cout << "\nAll UUID and EntityHandle tests PASSED successfully!\n";
   return 0;
 }

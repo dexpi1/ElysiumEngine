@@ -277,7 +277,7 @@ Events are dispatched down the `LayerStack` in **reverse order**: Overlays (such
   - `File`: New Scene, Open, Save, Save As, Exit.
   - `Edit`: Undo, Redo, Delete Selected Entity, Deselect.
   - `Scene`: Play, Pause, Step, Reset Camera View, Clear All.
-  - `Entities`: Quick-create Empty Entity, Ball, Box, or Platform.
+  - `Entities`: Quick-create Empty Entity, Rigid Body, or Audio Source.
   - `View`: Toggle visibility for any active panel.
   - `Options`: Switch themes (Dark, Classic, Light), toggle Debug Grid, Colliders, or AABBs.
 - **Shortcuts**:

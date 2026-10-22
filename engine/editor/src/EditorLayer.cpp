@@ -1,5 +1,6 @@
 #include "EditorLayer.hpp"
 #include "Application.hpp"
+#include "AudioSourceComponent.hpp"
 #include "Collider.hpp"
 #include "EditorLogSink.hpp"
 #include "Log.h"
@@ -289,6 +290,16 @@ void EditorLayer::RenderMenuBar(Scene &scene) {
         auto &rb = entity->CreateRigidBody();
         scene.AddGameObject(entity);
         m_context.selectedEntity = entity;
+      }
+      if (ImGui::MenuItem("Create Audio Source")) {
+        auto entity = std::make_shared<GameObject>("Audio Source");
+        entity->position =
+            Vec3(m_context.camera.center.x, m_context.camera.center.y, 0.0f);
+        entity->AddComponent<AudioSourceComponent>();
+        scene.AddGameObject(entity);
+        m_context.selectedEntity = entity;
+        ELYSIUM_INFO("Created Audio Source at ({:.2f}, {:.2f})",
+                     entity->position.x, entity->position.y);
       }
       ImGui::EndMenu();
     }

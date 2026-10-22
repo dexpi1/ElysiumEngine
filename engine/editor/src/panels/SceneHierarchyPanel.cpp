@@ -1,4 +1,5 @@
 #include "panels/SceneHierarchyPanel.hpp"
+#include "AudioSourceComponent.hpp"
 #include "Collider.hpp"
 #include "Log.h"
 #include <algorithm>
@@ -73,6 +74,17 @@ void SceneHierarchyPanel::OnImGuiRender(EditorContext &context, Scene &scene,
                      entity->position.x, entity->position.y);
       }
 
+      if (ImGui::MenuItem("Audio Source")) {
+        auto entity = std::make_shared<GameObject>("Audio Source");
+        entity->position =
+            Vec3(context.camera.center.x, context.camera.center.y, 0.0f);
+        entity->AddComponent<AudioSourceComponent>();
+        scene.AddGameObject(entity);
+        context.selectedEntity = entity;
+        ELYSIUM_INFO("Created Audio Source at ({:.2f}, {:.2f})",
+                     entity->position.x, entity->position.y);
+      }
+
       ImGui::EndPopup();
     }
 
@@ -123,6 +135,15 @@ void SceneHierarchyPanel::OnImGuiRender(EditorContext &context, Scene &scene,
               rb.AddColliders(col);
             }
           }
+          if (auto *audio = obj->GetComponent<AudioSourceComponent>()) {
+            auto &newAudio = clone->AddComponent<AudioSourceComponent>(
+                audio->filepath, audio->playOnAwake, audio->loop);
+            newAudio.volume = audio->volume;
+            newAudio.pitch = audio->pitch;
+            newAudio.isSpatial = audio->isSpatial;
+            newAudio.minDistance = audio->minDistance;
+            newAudio.attenuation = audio->attenuation;
+          }
           scene.AddGameObject(clone);
           context.selectedEntity = clone;
           ELYSIUM_INFO("Duplicated Entity: {}", clone->name);
@@ -169,6 +190,14 @@ void SceneHierarchyPanel::OnImGuiRender(EditorContext &context, Scene &scene,
             Vec3(context.camera.center.x, context.camera.center.y, 0.0f);
         auto &rb = entity->CreateRigidBody();
         rb.AddColliders(Collider::CreateSphere(0.5f, 1.0f));
+        scene.AddGameObject(entity);
+        context.selectedEntity = entity;
+      }
+      if (ImGui::MenuItem("Create Audio Source")) {
+        auto entity = std::make_shared<GameObject>("Audio Source");
+        entity->position =
+            Vec3(context.camera.center.x, context.camera.center.y, 0.0f);
+        entity->AddComponent<AudioSourceComponent>();
         scene.AddGameObject(entity);
         context.selectedEntity = entity;
       }
